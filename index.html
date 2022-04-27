@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knob test</title>
+    <style>
+        .knob {
+            width: 100px;
+            height: 100px;
+            transform: rotate(-45deg); 
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background-color: #333;
+        }
+        
+    </style>
+</head>
+<body>
+    <img class="knob" src="vector-knob.svg" draggable="false"/>
+    <script>
+        const knob = document.querySelector(".knob");
+        knob.addEventListener("mousedown", createListener);
+        knob.addEventListener("wheel",(e)=>{
+            turnKnob(e)
+            e.preventDefault();
+        })
+        
+        const knobState = {
+            min : -45,
+            max : 225,
+            currentAngle: -45
+        }
+
+        function createListener(event){
+            const moveEvent = document.addEventListener("mousemove", turnKnob)
+
+            const mouseUpFunction = ()=>{
+                document.removeEventListener("mousemove", turnKnob);
+                document.removeEventListener("mouseup", mouseUpFunction);
+            }
+
+            document.addEventListener("mouseup", mouseUpFunction)
+        }
+
+        function turnKnob(event){
+            if(event.deltaY){
+                applyAngle(event.deltaY/5);
+            }
+            else if(event.movementY){
+                applyAngle(event.movementY);
+            }
+        }
+
+        function applyAngle(eventValue){
+
+            let nextAngle = knobState.currentAngle -=eventValue
+
+            if(nextAngle > knobState.max){
+                nextAngle = knobState.max;
+            }else if(nextAngle < knobState.min){
+                nextAngle = knobState.min
+            }
+            
+            knobState.currentAngle = nextAngle;
+            knob.style.transform = `rotate(${knobState.currentAngle}deg)`;
+        }
+    </script>
+</body>
+</html>
